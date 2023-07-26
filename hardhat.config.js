@@ -1,9 +1,13 @@
 require("@nomicfoundation/hardhat-toolbox");
-require("@nomiclabs/hardhat-ethers");
+// require("@nomiclabs/hardhat-ethers");
 require("hardhat-deploy");
 require("hardhat-contract-sizer");
 require("dotenv").config();
 const { removeConsoleLog } = require("hardhat-preprocessor");
+
+require('@nomiclabs/hardhat-truffle5');
+require('@vechain/hardhat-vechain');
+require('@vechain/hardhat-web3');
 
 const MAINNET_RPC_URL =
     process.env.MAINNET_RPC_URL || process.env.ALCHEMY_MAINNET_RPC_URL || "https://eth-mainnet.alchemyapi.io/v2/";
@@ -43,47 +47,56 @@ module.exports = {
         localhost: {
             chainId: 31337,
         },
-        goerli: {
-            url: GOERLI_RPC_URL,
-            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
-            //accounts: {
-            //     mnemonic: MNEMONIC,
-            // },
-            //   gasPrice: 48573939,
-            saveDeployments: true,
-            chainId: 5,
-        },
-        sepolia: {
-            url: SEPOLIA_RPC_URL,
-            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
-            //accounts: {
-            //     mnemonic: MNEMONIC,
-            // },
-            // gasPrice: 48573939,
-            saveDeployments: true,
-            chainId: 11155111,
-        },
-        polygon: {
-            url: POLYGON_RPC_URL,
-            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
-            saveDeployments: true,
-            chainId: 137,
-            // gas: 21520590,
-            // gasPrice: 176000000000,
-            // maxPriorityFeePerGas : 38573939
-        },
-        arbitrumOne: {
-            url: ARBITRUM_RPC_URL,
-            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
-            saveDeployments: true,
-            chainId: 42161,
-        },
-        mainnet: {
-            url: MAINNET_RPC_URL,
-            accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
-            saveDeployments: true,
-            chainId: 1,
-        },
+        vechain: {
+            url: "http://127.0.0.1:8669",
+            accounts: {
+              mnemonic: "denial kitchen pet squirrel other broom bar gas better priority spoil cross",
+              count: 10,
+            },
+            restful: true,
+            gas: 10000000
+          }
+        // goerli: {
+        //     url: GOERLI_RPC_URL,
+        //     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+        //     //accounts: {
+        //     //     mnemonic: MNEMONIC,
+        //     // },
+        //     //   gasPrice: 48573939,
+        //     saveDeployments: true,
+        //     chainId: 5,
+        // },
+        // sepolia: {
+        //     url: SEPOLIA_RPC_URL,
+        //     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+        //     //accounts: {
+        //     //     mnemonic: MNEMONIC,
+        //     // },
+        //     // gasPrice: 48573939,
+        //     saveDeployments: true,
+        //     chainId: 11155111,
+        // },
+        // polygon: {
+        //     url: POLYGON_RPC_URL,
+        //     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+        //     saveDeployments: true,
+        //     chainId: 137,
+        //     // gas: 21520590,
+        //     // gasPrice: 176000000000,
+        //     // maxPriorityFeePerGas : 38573939
+        // },
+        // arbitrumOne: {
+        //     url: ARBITRUM_RPC_URL,
+        //     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+        //     saveDeployments: true,
+        //     chainId: 42161,
+        // },
+        // mainnet: {
+        //     url: MAINNET_RPC_URL,
+        //     accounts: PRIVATE_KEY !== undefined ? [PRIVATE_KEY] : [],
+        //     saveDeployments: true,
+        //     chainId: 1,
+        // },
     },
     etherscan: {
         // yarn hardhat verify --network <NETWORK> <CONTRACT_ADDRESS> <CONSTRUCTOR_PARAMETERS>
