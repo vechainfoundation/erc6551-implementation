@@ -1,6 +1,6 @@
 const ManagersTBA = artifacts.require('ManagersTBA');
 const { expect } = require('chai');
-const ADDRESS = "0xe5b22a7ea2921867D00C7E2853f084bF1a420bb8"
+const ADDRESS = "0xD06c09a1D2Df8948D94588E6BFcefb22d4f30264"
 
 contract('ManagersTBA', function (accounts) {
   beforeEach(async function () {
@@ -9,8 +9,15 @@ contract('ManagersTBA', function (accounts) {
   });
 
   it('Address is correct', async function () {
-      var ret = await this.ManagersTBA;
-      expect(ret.address).to.equal(ADDRESS);
+      var nft = await this.ManagersTBA;
+      expect(nft.address).to.equal(ADDRESS);
+    });
+
+    it('Mint to random address', async function () {
+        var nft = await this.ManagersTBA;
+        var mintResult = await nft.mint(1, "0x1D94FAA58597C0417207681a512Df24Bb7702acb", {value: 1000000000000000000});
+
+        expect(mintResult);
     });
 
 });
