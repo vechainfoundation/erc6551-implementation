@@ -1,9 +1,14 @@
 ## Deploy on Vechain
 1. Run Thor
-2. npm i --force
-3. npx hardhat deploy --network vechain
+2. `npm i --force`
+3. `npx hardhat deploy --network vechain`
 
 Note: If you want to redeploy you need to remove all temporary files and redo the process.
+
+## Run Tests
+1. Follow previous steps to deploy
+2. Use NFT address printed in the console in `ERC6551.test.js` 
+4. Run `npx hardhat test --network vechain`
 
 
 <h1 align="center">    <a href="https://themanagers.wtf/">
