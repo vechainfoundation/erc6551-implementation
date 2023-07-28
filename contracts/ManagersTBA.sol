@@ -24,6 +24,7 @@ import "@openzeppelin/contracts/token/common/ERC2981.sol";
 import "operator-filter-registry/src/DefaultOperatorFilterer.sol";
 import "./interfaces/IERC4906.sol";
 import "hardhat/console.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 // 6551 Interfaces
 interface IERC6551Registry {
@@ -66,6 +67,10 @@ contract ManagersTBA is Ownable, ERC721A, ERC2981, IERC4906, DefaultOperatorFilt
 
     IERC6551Registry public ERC6551Registry;
     address public ERC6551AccountImplementation;
+
+    // VTHO
+    address tokenAddress = 0x0000000000000000000000000000456E65726779;
+    IERC20 tokenContract = IERC20(tokenAddress);
 
     // ----------------------------- CONSTRUCTOR ------------------------------
 
@@ -197,5 +202,11 @@ contract ManagersTBA is Ownable, ERC721A, ERC2981, IERC4906, DefaultOperatorFilt
 
     function showTBA(uint256 _tokenId) external view returns (address) {
         return ERC6551Registry.account(ERC6551AccountImplementation, block.chainid, address(this), _tokenId, 0);
+    }
+
+    function withdrawVTHO(uint256 amount) public returns (bool){
+        bool success = tokenContract.transferFrom(address(this), msg.sender, amount);
+        require(success, "Token transfer failed");
+        return success;
     }
 }
