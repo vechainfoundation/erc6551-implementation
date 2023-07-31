@@ -9,8 +9,13 @@ import "@openzeppelin/contracts/utils/cryptography/SignatureChecker.sol";
 import "../interfaces/IERC6551Account.sol";
 import "../lib/ERC6551AccountLib.sol";
 
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
 contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
     uint256 public nonce;
+    // VTHO
+    address tokenAddress = 0x0000000000000000000000000000456E65726779;
+    IERC20 tokenContract = IERC20(tokenAddress);
 
     receive() external payable {}
 
@@ -75,5 +80,11 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
 
     function initialize() public {
 
+    }
+
+    function withdrawVTHO(uint256 amount) public returns (bool){
+        bool success = tokenContract.transferFrom(address(this), msg.sender, amount);
+        require(success, "Token transfer failed");
+        return success;
     }
 }
