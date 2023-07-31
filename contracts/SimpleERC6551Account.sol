@@ -78,7 +78,7 @@ contract SimpleERC6551Account is IERC165, IERC1271, IERC6551Account {
         return "";
     }
 
-    function initialize() public {
+    function initialize() public payable{
 
     }
 

@@ -2,7 +2,7 @@ const ManagersTBA = artifacts.require('ManagersTBA');
 const SimpleERC6551Account = artifacts.require("SimpleERC6551Account");
 const MyToken = artifacts.require('MyToken');
 const { expect } = require('chai');
-const NFT_ADDRESS = "0x6979fDd625A54341e111A2Fc81deC4e73da5d690"
+const NFT_ADDRESS = "0x37d2f350cA339D766e927b396c9F48336e427c31"
 
 
 contract('ManagersTBA', function (accounts) {
@@ -76,12 +76,30 @@ contract('ManagersTBA', function (accounts) {
       // var simpleERC6551Account = new SimpleERC6551Account(accountAddress);
       // console.log(simpleERC6551Account)
 
-      expect(1)
+      expect(true)
     });
 
     it("Withdraw previously sent VET", async function () {
       var result = await this.nft.withdraw(); // withdraws all balance
       expect(result);
+    });
+
+    it("Send/Receive VET to/from account", async function() {
+
+      var mintedSoFar = (await this.nft.totalSupply()).toNumber();
+      var ownerOfLastMintedNFT = await this.nft.showTBA(mintedSoFar);
+
+      console.log("Owner of last minted NFT: ", ownerOfLastMintedNFT);
+      var accountContract = await new SimpleERC6551Account(ownerOfLastMintedNFT);
+      console.log(accountContract.address);
+
+      // fund account first with 100 VET
+      var tx1 = await accountContract.initialize({value: 100000000000000000000});
+
+      // Run executeCall to send VET out of Token bound account
+      var tx2 = await accountContract.executeCall("0x25Df024637d4e56c1aE9563987Bf3e92C9f534c0", 1000000000000000000, [], {from: NEW_OWNER});
+
+      expect(true)
     });
 
   });
