@@ -2,7 +2,24 @@ const ManagersTBA = artifacts.require('ManagersTBA');
 const SimpleERC6551Account = artifacts.require("SimpleERC6551Account");
 const MyToken = artifacts.require('MyToken');
 const { expect } = require('chai');
-const NFT_ADDRESS = "0x510CfA4a2bF2E9b1De1D1B231C86790A45F9bA33"
+const NFT_ADDRESS = "0xF5E06A58546833fD127EE5f405937B3525831eD8"
+
+
+function getCallDataForVTHOTransfer(VTHO) {
+  const myTokenABI = VTHO.abi;
+  const functionSignature = 'transfer(address,uint256)';
+  const addressToSendTo = '0xb1690c08e213a35ed9bab7b318de14420fb57d8c';
+  const amountToSend = ethers.utils.parseUnits("1", 1);
+
+  var encodedFunctionCall = ethers.utils.defaultAbiCoder.encode(
+    ['string', 'address', 'uint256'],
+    [functionSignature, addressToSendTo, amountToSend]
+  );
+  
+  const contractInterface = new ethers.utils.Interface(myTokenABI);
+  var encodedFunctionCall = contractInterface.encodeFunctionData(functionSignature, [addressToSendTo, amountToSend]);
+  return encodedFunctionCall;
+}
 
 
 contract('ManagersTBA', function (accounts) {
@@ -52,40 +69,20 @@ contract('ManagersTBA', function (accounts) {
 
     describe("Token Transfers", async function(){
 
-      it('Send ERC20', async function () {
+      it('Send/Receive ERC20', async function () {
 
+        // Get token bound account of last minted NFT
         var mintedSoFar = (await this.nft.totalSupply()).toNumber();
         var ownerOfLastMintedNFT = await this.nft.showTBA(mintedSoFar);
-        const VTHO = await new MyToken("0x0000000000000000000000000000456E65726779");
-        var accountBalance = await VTHO.balanceOf(ownerOfLastMintedNFT);
-        console.log("Before NFT VTHO Balance: ", accountBalance.toString());
-        console.log("Sending VTHO to Account");
-        await VTHO.transfer(ownerOfLastMintedNFT, 1000000000000000, {from: FIRST_OWNER})
-        var accountBalance = await VTHO.balanceOf(ownerOfLastMintedNFT);
-        console.log("After NFT VTHO Balance: ", accountBalance.toString());
-
-        const myTokenABI = VTHO.abi;
-
-        const functionSignature = 'transfer(address,uint256)';
-        const addressToSendTo = '0xb1690c08e213a35ed9bab7b318de14420fb57d8c';
-        const amountToSend = ethers.utils.parseUnits("1", 1);
-
-        var encodedFunctionCall = ethers.utils.defaultAbiCoder.encode(
-          ['string', 'address', 'uint256'],
-          [functionSignature, addressToSendTo, amountToSend]
-        );
         
-        const contractInterface = new ethers.utils.Interface(myTokenABI);
-        var encodedFunctionCall = contractInterface.encodeFunctionData(functionSignature, [addressToSendTo, amountToSend]);
+        // Transfer VTHO to this account
+        const VTHO = await new MyToken("0x0000000000000000000000000000456E65726779");
+        await VTHO.transfer(ownerOfLastMintedNFT, 1000000000000000, {from: FIRST_OWNER})
 
-        // console.log(encodedFunctionCall);
-
-
-        // Run executeCall to send VET out of Token bound account
-        var mintedSoFar = (await this.nft.totalSupply()).toNumber();
-        var ownerOfLastMintedNFT = await this.nft.showTBA(mintedSoFar);
-
-        // console.log("Owner of last minted NFT: ", ownerOfLastMintedNFT);
+        // Construct calldata for executeCall on token bound account
+        var encodedFunctionCall = getCallDataForVTHOTransfer(VTHO);
+        
+        // Call the executeCall method on the token bound account
         var accountContract = await new SimpleERC6551Account(ownerOfLastMintedNFT);
         var tx = await accountContract.executeCall("0x0000000000000000000000000000456E65726779", 0, encodedFunctionCall, {from: NEW_OWNER});
 
@@ -99,14 +96,13 @@ contract('ManagersTBA', function (accounts) {
 
     it("Send/Receive VET to/from account", async function() {
 
+      // Get token bound account of last minted NFT
       var mintedSoFar = (await this.nft.totalSupply()).toNumber();
       var ownerOfLastMintedNFT = await this.nft.showTBA(mintedSoFar);
 
-      console.log("Owner of last minted NFT: ", ownerOfLastMintedNFT);
       var accountContract = await new SimpleERC6551Account(ownerOfLastMintedNFT);
-      console.log(accountContract.address);
 
-      // fund account first with 100 VET
+      // Fund account with 100 VET
       var tx1 = await accountContract.initialize({value: 100000000000000000000});
 
       // Run executeCall to send VET out of Token bound account
